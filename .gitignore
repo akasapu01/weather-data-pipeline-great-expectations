@@ -10,3 +10,7 @@ great_expectations/uncommitted/
 *.json.bak
 .DS_Store
 Thumbs.db
+
+# local pipeline output and test caches
+data/local/
+.pytest_cache/

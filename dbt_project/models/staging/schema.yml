@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: stg_hourly_observations
+    description: "Cleaned, typed, de-duplicated hourly weather observations."
+    columns:
+      - name: city
+        description: "City name."
+        tests: [not_null]
+      - name: observed_at
+        description: "Observation timestamp (UTC)."
+        tests: [not_null]
+      - name: temperature_c
+        description: "Air temperature at 2m, degrees Celsius."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -90
+              max_value: 60
+      - name: humidity_pct
+        description: "Relative humidity, percent."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [city, observed_at]
+
+  - name: fct_weather_city_daily
+    description: "Daily weather summary per city (analytics-ready fact table)."
+    columns:
+      - name: city
+        tests: [not_null]
+      - name: observed_date
+        tests: [not_null]
+      - name: avg_temperature_c
+        tests: [not_null]
